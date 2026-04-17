@@ -1,0 +1,5 @@
+{
+  "name": "강해설교 분석기",
+  "description": "Analyzes sermons based on John MacArthur's expository preaching principles.",
+  "requestFramePermissions": []
+}

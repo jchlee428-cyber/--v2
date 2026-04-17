@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+
+  --color-gray-900: #111827;
+
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+
+  --color-rose-50: #fff1f2;
+  --color-rose-200: #fecdd3;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+  --color-rose-800: #9f1239;
+
+  --color-red-50: #fef2f2;
+  --color-red-500: #ef4444;
+  --color-red-700: #b91c1c;
+
+  /* Override shadows to use rgba instead of oklch */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Override global ring and shadow variables for html2canvas compatibility */
+@layer base {
+  :root {
+    --tw-ring-color: rgba(59, 130, 246, 0.5);
+    --tw-ring-offset-color: #fff;
+    --tw-shadow-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Override prose variables to use hex colors instead of oklch for html2canvas compatibility */
+.prose, .prose-stone {
+  --tw-prose-body: #44403c !important;
+  --tw-prose-headings: #1c1917 !important;
+  --tw-prose-lead: #57534e !important;
+  --tw-prose-links: #1c1917 !important;
+  --tw-prose-bold: #1c1917 !important;
+  --tw-prose-counters: #78716c !important;
+  --tw-prose-bullets: #d6d3d1 !important;
+  --tw-prose-hr: #e7e5e4 !important;
+  --tw-prose-quotes: #1c1917 !important;
+  --tw-prose-quote-borders: #e7e5e4 !important;
+  --tw-prose-captions: #78716c !important;
+  --tw-prose-code: #1c1917 !important;
+  --tw-prose-pre-code: #e7e5e4 !important;
+  --tw-prose-pre-bg: #292524 !important;
+  --tw-prose-th-borders: #d6d3d1 !important;
+  --tw-prose-td-borders: #e7e5e4 !important;
+  --tw-prose-kbd-shadows: rgba(0, 0, 0, 0.1) !important;
+}

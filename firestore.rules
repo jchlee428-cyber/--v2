@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required) - Firebase Auth UID
+    //   - email: string (required) - User's email address
+    //   - isSubscribed: boolean (required) - Subscription status
+    //   - stripeCustomerId: string (optional) - Stripe Customer ID
+    //   - subscriptionId: string (optional) - Stripe Subscription ID
+    //   - subscriptionEndDate: string (optional) - Subscription end date
+    //   - createdAt: string (required) - Account creation date
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    function hasRequiredUserFields(data) {
+      return data.keys().hasAll(['uid', 'email', 'isSubscribed', 'createdAt']);
+    }
+
+    function isValidUser(data) {
+      return hasRequiredUserFields(data) &&
+             data.uid is string && data.uid.size() > 0 &&
+             isValidEmail(data.email) &&
+             data.isSubscribed is bool &&
+             isValidDateString(data.createdAt) &&
+             (!('stripeCustomerId' in data) || data.stripeCustomerId is string) &&
+             (!('subscriptionId' in data) || data.subscriptionId is string) &&
+             (!('subscriptionEndDate' in data) || isValidDateString(data.subscriptionEndDate));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+      
+      // Users can create their own profile, but cannot set isSubscribed to true
+      allow create: if isOwner(userId) && 
+                    isValidUser(request.resource.data) && 
+                    request.resource.data.uid == userId &&
+                    request.resource.data.isSubscribed == false;
+                    
+      // Users cannot update their own profile (subscription status is updated by backend)
+      allow update: if false;
+      
+      allow delete: if false;
+    }
+  }
+}

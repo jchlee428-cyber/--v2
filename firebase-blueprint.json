@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and subscription status",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User's email address"
+        },
+        "isSubscribed": {
+          "type": "boolean",
+          "description": "Whether the user has an active subscription"
+        },
+        "stripeCustomerId": {
+          "type": "string",
+          "description": "Stripe Customer ID"
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Stripe Subscription ID"
+        },
+        "subscriptionEndDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the subscription ends"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account creation date"
+        }
+      },
+      "required": ["uid", "email", "isSubscribed", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "Stores user profiles and their subscription status"
+    }
+  }
+}
