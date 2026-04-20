@@ -577,7 +577,17 @@ ${window.location.href}
         }),
       });
       
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        if (responseText.includes('The page') || responseText.includes('<html')) {
+          throw new Error('결제 서버(API)에 연결할 수 없습니다. Vercel에 배포된 경우 백엔드 서버가 제대로 실행되지 않고 있을 확률이 높습니다.');
+        }
+        throw new Error('서버에서 올바르지 않은 응답이 왔습니다: ' + responseText.slice(0, 50));
+      }
+
       if (data.url) {
         // iframe 내부에서 실행 중인지 확인
         if (window.self !== window.top) {
@@ -618,7 +628,17 @@ ${window.location.href}
         }),
       });
       
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        if (responseText.includes('The page') || responseText.includes('<html')) {
+          throw new Error('결제 서버(API)에 연결할 수 없습니다. Vercel에 배포된 경우 백엔드 서버가 제대로 실행되지 않고 있을 확률이 높습니다.');
+        }
+        throw new Error('서버에서 올바르지 않은 응답이 왔습니다: ' + responseText.slice(0, 50));
+      }
+
       if (data.url) {
         if (window.self !== window.top) {
           window.open(data.url, '_blank');
