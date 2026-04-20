@@ -638,16 +638,25 @@ ${window.location.href}
 
   const handleLogin = async () => {
     try {
+      setIsLoading(true);
       await signInWithPopup(auth, googleProvider);
     } catch (error: any) {
       console.error("Login failed:", error);
+      let errorMsg = `로그인 중 오류가 발생했습니다: ${error.message}`;
+      
       if (error.code === 'auth/popup-blocked') {
-        setAlertMessage("팝업이 차단되었습니다. 주소창 우측에서 팝업 차단을 해제해주세요.");
+        errorMsg = "팝업이 차단되었습니다. 주소창 우측에서 팝업 차단을 해제해주세요.";
       } else if (error.code === 'auth/unauthorized-domain') {
-        setAlertMessage("승인되지 않은 도메인입니다. 파이어베이스 인증 설정에서 현재 주소(v2-rust-five.vercel.app)가 '승인된 도메인(Authorized domains)'에 추가되어 있는지 다시 한 번 확인해주세요.");
-      } else {
-        setAlertMessage(`로그인 중 오류가 발생했습니다: ${error.message} (에러 코드: ${error.code})`);
+        errorMsg = "승인되지 않은 도메인입니다. 파이어베이스 인증 설정에서 현재 주소(v2-rust-five.vercel.app)가 '승인된 도메인(Authorized domains)'에 추가되어 있는지 다시 한 번 확인해 주세요.";
+      } else if (error.code === 'auth/popup-closed-by-user') {
+         errorMsg = "로그인 창이 사용자에 의해 닫혔습니다. 다시 시도해 주세요.";
       }
+      
+      setAlertMessage(errorMsg);
+      // Fallback alert in case the UI is ignoring the state
+      alert(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
