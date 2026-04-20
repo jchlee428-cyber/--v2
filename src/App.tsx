@@ -37,6 +37,7 @@ interface ImprovementSuggestion {
 
 interface AnalysisData {
   summary: string;
+  coreThemesAndTheology: string[];
   outline: OutlineItem[];
   toneAnalysis: string;
   improvementSuggestion: ImprovementSuggestion;
@@ -425,6 +426,8 @@ export default function App() {
       return text.trim();
     }).join('\n\n');
 
+    let themesText = `## 핵심 주제 및 신학 (Core Themes and Theology)\n${analysisResult.coreThemesAndTheology?.map(t => `- ${t}`).join('\n') || '- 분석 결과 없음'}\n\n`;
+
     let toneText = `## 어휘 및 어조 분석\n${analysisResult.toneAnalysis}\n\n`;
     
     let improvementText = '';
@@ -438,7 +441,7 @@ export default function App() {
 ## 설교 핵심 요약
 ${analysisResult.summary}
 
-## 설교 개요 (Outline)
+${themesText}## 설교 개요 (Outline)
 ${outlineText}
 
 ${toneText}${improvementText}## 긍정적인 부분
@@ -540,7 +543,72 @@ ${window.location.href}
         margin:       [15, 15, 15, 15] as [number, number, number, number],
         filename:     filename,
         image:        { type: 'jpeg' as const, quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          letterRendering: true, 
+          scrollY: 0,
+          onclone: (document: Document) => {
+            const elements = document.querySelectorAll('*');
+            const colorOverrides: Record<string, string> = {
+              'bg-white': 'background-color: #ffffff !important;',
+              'bg-stone-50': 'background-color: #fafaf9 !important;',
+              'bg-stone-100': 'background-color: #f5f5f4 !important;',
+              'bg-blue-50': 'background-color: #eff6ff !important;',
+              'bg-indigo-50': 'background-color: #eef2ff !important;',
+              'bg-amber-50': 'background-color: #fffbeb !important;',
+              'bg-amber-100': 'background-color: #fef3c7 !important;',
+              'bg-emerald-50': 'background-color: #ecfdf5 !important;',
+              'bg-rose-50': 'background-color: #fff1f2 !important;',
+              'text-white': 'color: #ffffff !important;',
+              'text-stone-400': 'color: #a8a29e !important;',
+              'text-stone-500': 'color: #78716c !important;',
+              'text-stone-600': 'color: #57534e !important;',
+              'text-stone-700': 'color: #44403c !important;',
+              'text-stone-800': 'color: #292524 !important;',
+              'text-stone-900': 'color: #1c1917 !important;',
+              'text-blue-500': 'color: #3b82f6 !important;',
+              'text-blue-600': 'color: #2563eb !important;',
+              'text-blue-800': 'color: #1e40af !important;',
+              'text-blue-900': 'color: #1e3a8a !important;',
+              'text-indigo-600': 'color: #4f46e5 !important;',
+              'text-indigo-800': 'color: #3730a3 !important;',
+              'text-amber-600': 'color: #d97706 !important;',
+              'text-amber-800': 'color: #92400e !important;',
+              'text-emerald-500': 'color: #10b981 !important;',
+              'text-emerald-600': 'color: #059669 !important;',
+              'text-emerald-800': 'color: #065f46 !important;',
+              'text-rose-500': 'color: #f43f5e !important;',
+              'text-rose-600': 'color: #e11d48 !important;',
+              'text-rose-800': 'color: #9f1239 !important;',
+              'border-stone-100': 'border-color: #f5f5f4 !important;',
+              'border-stone-200': 'border-color: #e7e5e4 !important;',
+              'border-stone-300': 'border-color: #d6d3d1 !important;',
+              'border-blue-200': 'border-color: #bfdbfe !important;',
+              'border-indigo-200': 'border-color: #c7d2fe !important;',
+              'border-amber-200': 'border-color: #fde68a !important;',
+              'border-emerald-200': 'border-color: #a7f3d0 !important;',
+              'border-rose-200': 'border-color: #fecdd3 !important;'
+            };
+            
+            elements.forEach(el => {
+              if (!(el instanceof HTMLElement)) return;
+              const className = el.className;
+              if (typeof className !== 'string') return;
+              
+              let inlineStyle = '';
+              Object.keys(colorOverrides).forEach(key => {
+                if (className.includes(key)) {
+                  inlineStyle += colorOverrides[key];
+                }
+              });
+              
+              if (inlineStyle) {
+                el.style.cssText += inlineStyle;
+              }
+            });
+          }
+        },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
         pagebreak:    { mode: ['css', 'legacy'], avoid: ['p', 'h1', 'h2', 'h3', 'h4', 'li', '.rounded-xl', '.rounded-lg', 'strong', 'span'] }
       };
@@ -752,6 +820,7 @@ ${window.location.href}
             type: Type.OBJECT,
             properties: {
               summary: { type: Type.STRING, description: "강해설교 원칙에 비추어 본 설교 핵심 요약" },
+              coreThemesAndTheology: { type: Type.ARRAY, items: { type: Type.STRING }, description: "설교의 핵심 주제 및 신학적 기반 (Core Themes and Theology)" },
               outline: { 
                 type: Type.ARRAY, 
                 description: "설교의 논리적 흐름에 따른 개요(서론, 본론 대지, 결론 등)",
@@ -780,7 +849,7 @@ ${window.location.href}
               criticalPoints: { type: Type.ARRAY, items: { type: Type.STRING }, description: "강해설교 원칙에 어긋나거나 개선이 필요한 비판적인 평가 부분들. 어떤 원칙을 위배했는지 명시적으로 포함하여 작성 (예: '[원칙 7 위배] 개인적인 예화가 너무 긺')" },
               detailedAnalysis: { type: Type.STRING, description: "7가지 핵심 원칙 각각에 대한 심층적이고 상세한 분석 및 평가. 반드시 설교 본문의 특정 구절을 직접 인용하여 근거로 제시할 것 (마크다운 포맷)" }
             },
-            required: ["summary", "outline", "toneAnalysis", "improvementSuggestion", "positivePoints", "criticalPoints", "detailedAnalysis"]
+            required: ["summary", "coreThemesAndTheology", "outline", "toneAnalysis", "improvementSuggestion", "positivePoints", "criticalPoints", "detailedAnalysis"]
           }
         }
       });
@@ -1178,6 +1247,24 @@ ${window.location.href}
                         설교 핵심 요약
                       </h3>
                       <p className="text-stone-700 leading-relaxed">{analysisResult.summary}</p>
+                    </div>
+
+                    {/* Core Themes and Theology */}
+                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                      <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
+                        <BookMarked className="w-5 h-5 text-blue-600" />
+                        Core Themes and Theology
+                      </h3>
+                      <ul className="space-y-3">
+                        {analysisResult.coreThemesAndTheology ? analysisResult.coreThemesAndTheology.map((theme, idx) => (
+                          <li key={idx} className="text-blue-900 text-sm flex items-start gap-2 leading-relaxed">
+                            <span className="mt-0.5 text-blue-500">•</span>
+                            <span>{theme}</span>
+                          </li>
+                        )) : (
+                          <li className="text-blue-600 text-sm italic">분석 결과가 없습니다.</li>
+                        )}
+                      </ul>
                     </div>
 
                     {/* Outline */}
