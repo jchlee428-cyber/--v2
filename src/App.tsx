@@ -636,9 +636,24 @@ ${window.location.href}
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      if (error.code === 'auth/popup-blocked') {
+        setAlertMessage("팝업이 차단되었습니다. 주소창 우측에서 팝업 차단을 해제해주세요.");
+      } else if (error.code === 'auth/unauthorized-domain') {
+        setAlertMessage("승인되지 않은 도메인입니다. 파이어베이스 인증 설정에서 현재 주소(v2-rust-five.vercel.app)가 '승인된 도메인(Authorized domains)'에 추가되어 있는지 다시 한 번 확인해주세요.");
+      } else {
+        setAlertMessage(`로그인 중 오류가 발생했습니다: ${error.message} (에러 코드: ${error.code})`);
+      }
+    }
+  };
+
   const handleAnalyze = async () => {
     if (!currentUser) {
-      signInWithPopup(auth, googleProvider);
+      handleLogin();
       return;
     }
 
@@ -811,7 +826,7 @@ ${window.location.href}
               </div>
             ) : (
               <button
-                onClick={() => signInWithPopup(auth, googleProvider)}
+                onClick={handleLogin}
                 className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 rounded-md sm:rounded-lg transition-colors whitespace-nowrap"
               >
                 <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
